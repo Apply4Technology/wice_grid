@@ -363,7 +363,7 @@ module Wice
         relation = apply_sort_by relation
 
         # If relation is an Array, it got the sort from apply_sort_by.
-        relation = relation.order(@ar_options[:order]) if !relation.is_a?(Array)
+        relation = relation.order(Arel.sql(@ar_options[:order])) if !relation.is_a?(Array)
 
         if !output_csv? && !all_record_mode?
           if relation.is_a?(Array)
@@ -492,7 +492,7 @@ module Wice
 
     # with this variant we get even those values which do not appear in the resultset
     def distinct_values_for_column(column)  #:nodoc:
-      column.model.select("distinct #{column.name}").order("#{column.name} asc").collect do|ar|
+      column.model.select("distinct #{column.name}").order(Arel.sql("#{column.name} asc")).collect do |ar|
         ar[column.name]
       end.reject(&:blank?).map { |i| [i, i] }
     end
@@ -644,7 +644,7 @@ module Wice
         relation = @relation
                    .joins(@ar_options[:joins])
                    .includes(@ar_options[:include])
-                   .order(@ar_options[:order])
+                   .order(Arel.sql(@ar_options[:order]))
                    .merge(@ar_options[:conditions])
 
         relation = add_references relation
