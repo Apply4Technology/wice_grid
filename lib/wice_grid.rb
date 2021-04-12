@@ -362,8 +362,9 @@ module Wice
         relation = add_references relation
         relation = apply_sort_by relation
 
+        arel_order = @ar_options[:order].is_a?(String) ? Arel.sql(@ar_options[:order]) : @ar_options[:order]
         # If relation is an Array, it got the sort from apply_sort_by.
-        relation = relation.order(Arel.sql(@ar_options[:order])) if !relation.is_a?(Array)
+        relation = relation.order(arel_order) if !relation.is_a?(Array)
 
         if !output_csv? && !all_record_mode?
           if relation.is_a?(Array)
@@ -640,11 +641,13 @@ module Wice
       form_ar_options
       relation = nil
 
+      arel_order = @ar_options[:order].is_a?(String) ? Arel.sql(@ar_options[:order]) : @ar_options[:order]
+
       use_default_or_unscoped do
         relation = @relation
                    .joins(@ar_options[:joins])
                    .includes(@ar_options[:include])
-                   .order(Arel.sql(@ar_options[:order]))
+                   .order(arel_order)
                    .merge(@ar_options[:conditions])
 
         relation = add_references relation
